@@ -1,0 +1,264 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Alice OS 13.3</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body><div id="aliceVoiceOrb" class="alice-voice-orb" role="button" tabindex="0"
+     title="Alice local voice control" aria-label="Start Alice voice control"
+     onclick="toggleAliceVoice()" onkeydown="if(event.key==='Enter'||event.key===' ')toggleAliceVoice()">
+  <span class="orb-core"></span><span class="orb-ring ring-a"></span><span class="orb-ring ring-b"></span>
+  <span class="orb-state" id="aliceVoiceState">READY</span>
+</div>
+
+<div id="lockScreen" class="lock-screen hidden" aria-hidden="true">
+  <div class="lock-backdrop"></div>
+  <div class="lock-card" role="dialog" aria-modal="true" aria-labelledby="lockGreeting">
+    <div class="lock-brand"><div class="lock-orb"><img src="/assets/alice-logo.svg" alt="Alice OS"></div><div><div class="eyebrow">ALICE OS</div><h1 id="lockGreeting">Welcome back</h1><p id="lockOwnerName">Owner</p></div></div>
+    <div id="lockTime" class="lock-time">--:--</div><div id="lockDate" class="lock-date"></div>
+    <p class="lock-hint">This PC is protected. Verify the owner password to continue.</p>
+    <form id="unlockForm" autocomplete="off"><label class="sr-only" for="unlockPassword">Owner password</label><input id="unlockPassword" type="password" placeholder="Owner password" autocomplete="current-password" required><button id="unlockButton" class="lock-button" type="submit"><span id="unlockButtonText">Unlock Alice</span><span id="unlockSpinner" class="button-spinner hidden"></span></button><div id="unlockError" class="lock-error" role="alert"></div><div id="unlockMsg" class="lock-error"></div></form>
+    <button class="lock-help" onclick="showLockHelp()">Need help?</button>
+  </div>
+</div>
+
+<div id="desktop">
+  <div class="desktop-shade"></div>
+  <header class="topbar">
+    <div class="brand"><div class="alice-mark"><img src="/assets/alice-logo.svg" alt="Alice OS"></div><div><b>ALICE</b><small> PERSONAL DIGITAL ASSISTANT</small></div></div>
+    <div class="top-search"><span>⌕</span><input id="desktopSearch" placeholder="Search Alice, apps, files and settings"><kbd>Ctrl</kbd><kbd>K</kbd></div>
+    <div class="top-actions"><button class="icon-btn" onclick="openAliceAssistant()" title="Ask Alice">✦</button><button class="icon-btn" onclick="toggleNotifications()" title="Notifications">◔</button><button class="profile-chip" onclick="openWindow('settings')"><span id="profileAvatar"><img src="/assets/alice-logo.svg" alt="Alice OS"></span><span id="ownerName">Owner</span></button></div>
+  </header>
+
+  <section class="widgets">
+    <div class="glass-card clock-card"><div class="card-label">LOCAL TIME</div><div id="bigClock">--:--</div><div id="date">Loading…</div></div>
+    <div class="glass-card system-card"><div class="card-head"><span>System</span><span class="live-dot">● LIVE</span></div><div class="metric"><span>CPU</span><b data-system="cpu" id="cpu">--</b></div><div class="bar"><i id="cpuBar" data-system-bar="cpu"></i></div><div class="metric"><span>Memory</span><b data-system="ram" id="ram">--</b></div><div class="bar"><i id="ramBar" data-system-bar="ram"></i></div><div class="metric"><span>Storage</span><b data-system="storage" id="storage">--</b></div><div class="bar"><i id="storageBar" data-system-bar="storage"></i></div></div>
+    <div class="glass-card note-card"><div class="card-head"><span>Quick note</span><span>⌁</span></div><textarea id="note" placeholder="Write something for Alice to remember…"></textarea><button onclick="saveNote();toast('Alice','Note saved locally.')">Save note</button></div>
+  </section>
+
+  <main class="hero">
+    <div class="hero-orb"><div class="orb-ring r1"></div><div class="orb-ring r2"></div><div class="orb-core"><img src="/assets/alice-logo.svg" alt="Alice OS"></div></div>
+    <div class="status-line"><span class="status-dot"></span> Alice is ready <span class="offline-badge">OFFLINE</span></div>
+    <div class="target-branding"><div class="target-alice-name">ALICE OS</div><div class="target-tagline">Smarter • Safer • Yours</div></div>
+    <h1>Hello, <span id="heroOwner">Owner</span></h1>
+    <p>Your local digital workspace is ready.</p>
+    <div class="ask"><span class="spark">✦</span><input id="askInput" placeholder="Ask Alice or type a command…"><button onclick="askAlice()">➜</button></div>
+    <div class="hero-shortcuts"><button onclick="openWindow('chat')">Ask Alice</button><button onclick="openWindow('files')">Open files</button><button onclick="openWindow('skills')">Explore skills</button></div>
+  </main>
+
+  <div class="desktop-icons" id="desktopIcons" aria-label="Alice OS desktop icons"></div>
+  <button id="homeCustomizeButton" class="home-customize-button" onclick="openHomeCustomizer()" title="Customize home screen">✦ Customize</button>
+
+  <div id="offlinePill" class="offline-pill"><span></span> Offline mode</div>
+  <aside class="target-right-rail" aria-label="Alice OS desktop widgets">
+    <section class="target-card weather-card" data-widget-id="weather">
+      <div class="target-card-head"><span>☁</span><b>26°C</b></div>
+      <div class="target-muted">Accra • Local display</div>
+      <div class="target-small">Partly cloudy</div>
+    </section>
+    <section class="target-card target-system-card" data-widget-id="system">
+      <div class="target-card-title"><span>System Status</span><span class="target-live">● LIVE</span></div>
+      <div class="target-metric"><span>▣ <b>CPU</b></span><strong id="targetCpu">--</strong></div><div class="target-bar"><i id="targetCpuBar"></i></div>
+      <div class="target-metric"><span>▤ <b>RAM</b></span><strong id="targetRam">--</strong></div><div class="target-bar"><i id="targetRamBar"></i></div>
+      <div class="target-metric"><span>▰ <b>Storage</b></span><strong id="targetStorage">--</strong></div><div class="target-bar"><i id="targetStorageBar"></i></div>
+    </section>
+    <section class="target-card network-card" data-widget-id="network">
+      <div class="target-card-title"><span>✣ Network</span><span class="target-network-state" id="targetNetworkState">Offline-first</span></div>
+      <div class="network-item"><span>◉</span><div><b>Local network</b><small>127.0.0.1</small></div></div>
+      <div class="network-item"><span>ᛒ</span><div><b>Bluetooth</b><small>Device controls available</small></div></div>
+    </section>
+    <section class="target-card assistant-card" data-widget-id="assistant">
+      <div class="target-card-title"><span>Alice Assistant</span><span>↗</span></div>
+      <div class="mini-orb"><span><img src="/assets/alice-logo.svg" alt="Alice OS"></span></div>
+      <div class="assistant-prompt">How can I help you today?</div>
+      <button class="assistant-mic" onclick="toggleAliceVoice()" aria-label="Start Alice voice control">●</button>
+    </section>
+  </aside>
+  <nav class="taskbar win-taskbar" id="taskbar" aria-label="Alice OS taskbar">
+    <button class="task-icon task-start" onclick="toggleStart()" title="Start" aria-label="Start menu"><span><img src="/assets/alice-logo.svg" alt="Alice OS"></span></button>
+    <button class="task-icon task-search" onclick="openTaskbarSearch()" title="Search" aria-label="Search"><span class="fluent-icon">⌕</span></button>
+    <button class="task-icon task-view" onclick="toggleTaskView()" title="Task View" aria-label="Task View"><span class="fluent-icon">▣</span></button>
+    <button class="task-icon task-widgets" onclick="toggleDesktopWidgets()" title="Widgets" aria-label="Widgets"><span class="fluent-icon">▦</span></button>
+    <span class="task-divider" aria-hidden="true"></span>
+    <div class="task-pinned" aria-label="Pinned apps"></div>
+    <div class="task-windows" id="taskWindows" aria-label="Open windows"></div>
+    <div class="task-tray">
+      <button class="tray-icon" onclick="toggleAliceNetwork()" title="Network access" aria-label="Network access"><span class="fluent-icon">⌁</span></button>
+      <button class="tray-icon" onclick="openWindow('devices')" title="Bluetooth / Devices" aria-label="Bluetooth and devices"><span class="fluent-icon">◈</span></button>
+      <button class="tray-icon" onclick="toggleQuickSettings()" title="Quick settings" aria-label="Quick settings"><span class="fluent-icon">⌁</span></button>
+      <button class="tray-icon" onclick="toggleNotifications()" title="Notifications" aria-label="Notifications"><span class="fluent-icon">◔</span></button>
+      <button class="tray-clock" onclick="toggleCalendarPanel()" title="Date and time" aria-label="Date and time"><b id="clock">--:--</b><small id="clockDate">Loading…</small></button>
+    </div>
+  </nav>
+
+  <section id="winXMenu" class="winx-menu hidden" aria-label="Power user menu">
+    <div class="winx-header"><div><b>Power User</b><small>Windows-style system tools</small></div><button onclick="toggleWinX()">×</button></div>
+    <div class="winx-grid">
+      <button onclick="openWinX('apps')"><b>▦</b><span>Installed apps</span></button>
+      <button onclick="openWinX('mobility')"><b>◉</b><span>Mobility Center</span></button>
+      <button onclick="openWinX('power')"><b>◒</b><span>Power options</span></button>
+      <button onclick="openWinX('event')"><b>◷</b><span>Event Viewer</span></button>
+      <button onclick="openWinX('system')"><b>▣</b><span>System</span></button>
+      <button onclick="openWinX('device')"><b>◈</b><span>Device Manager</span></button>
+      <button onclick="openWinX('network')"><b>⌁</b><span>Network connections</span></button>
+      <button onclick="openWinX('disk')"><b>◫</b><span>Disk Management</span></button>
+      <button onclick="openWinX('computer')"><b>▤</b><span>Computer Management</span></button>
+      <button onclick="openWinX('task')"><b>▥</b><span>Task Manager</span></button>
+      <button onclick="openWinX('terminal')"><b>&gt;_</b><span>Terminal</span></button>
+      <button onclick="openWinX('terminal-admin')"><b>⚿</b><span>Terminal (Admin)</span></button>
+      <button onclick="openWinX('taskbar')"><b>≡</b><span>Taskbar settings</span></button>
+      <button onclick="openWinX('settings')"><b>⚙</b><span>Settings</span></button>
+      <button onclick="openWinX('lock')"><b>⌁</b><span>Lock</span></button>
+      <button onclick="openWinX('shutdown')"><b>⏻</b><span>Shut down / sign out</span></button>
+    </div>
+  </section>
+  <section id="taskViewPanel" class="taskview-panel hidden" aria-label="Task View"><div class="taskview-head"><h3>Task View</h3><button onclick="toggleTaskView()">×</button></div><div id="taskViewList" class="taskview-list"></div></section>
+  <section id="calendarPanel" class="calendar-panel hidden" aria-label="Calendar"><div class="calendar-head"><div><b id="calendarToday">Today</b><small>Local date & time</small></div><button onclick="toggleCalendarPanel()">×</button></div><div id="calendarBody"></div><button class="primary-btn" onclick="openWindow('settings');toggleCalendarPanel()">Date & time settings</button></section>
+
+  <section id="startMenu" class="start-menu hidden">
+    <div class="start-head"><div><div class="eyebrow">ALICE OS</div><h2>All your tools</h2></div><button onclick="openWindow('settings');toggleStart()">⚙</button></div>
+    <div class="start-search"><span>⌕</span><input id="appSearch" placeholder="Search apps, settings and files…"></div>
+    <div class="menu-section-title">Pinned</div>
+    <div class="menu-grid" id="appGrid">
+      <button data-app="home" onclick="openWindow('home')"><span>✦</span><small>Alice Home</small></button><button data-app="chat" onclick="openWindow('chat')"><span>◌</span><small>Alice Chat</small></button><button data-app="intelligence" onclick="openWindow('intelligence')"><span>✧</span><small>Intelligence</small></button><button data-app="ai-core" onclick="openAliceIntelligenceCore()"><span>◉</span><small>AI Core</small></button><button data-app="files" onclick="openWindow('files')"><span>▤</span><small>Files & Data</small></button><button data-app="terminal" onclick="openWindow('terminal')"><span>&gt;_</span><small>Terminal</small></button><button data-app="skills" onclick="openWindow('skills')"><span>▦</span><small>Skills Hub</small></button><button data-app="software" onclick="openSoftwareCenter()"><span>⬇</span><small>Software & System</small></button><button data-app="control" onclick="openControlCenter()"><span>◫</span><small>System Control</small></button><button data-app="security" onclick="openWindow('security')"><span>◇</span><small>Security Lab</small></button><button data-app="devices" onclick="openWindow('devices')"><span>◈</span><small>Devices</small></button><button data-app="vault" onclick="openWindow('vault')"><span>▣</span><small>Memory Vault</small></button><button data-app="settings" onclick="openWindow('settings')"><span>⚙</span><small>Settings</small></button><button data-app="accounts" onclick="openAccountsCenter()"><span>◎</span><small>Accounts</small></button><button data-app="lock" onclick="lockAlice()"><span>⏻</span><small>Lock</small></button>
+    </div>
+    <div class="start-footer"><span>Offline-first desktop</span><span id="startVersion">v11.7</span></div>
+  </section>
+
+  <section id="homeCustomizer" class="home-customizer hidden" aria-label="Customize Alice OS home screen">
+    <div class="customizer-head"><div><div class="eyebrow">ALICE OS</div><h2>Customize Home</h2><p>Choose what appears on your desktop. Changes are saved on this PC.</p></div><button onclick="closeHomeCustomizer()" aria-label="Close">×</button></div>
+    <div class="customizer-tabs"><button class="active" data-tab="widgets" onclick="switchHomeTab('widgets')">Widgets</button><button data-tab="icons" onclick="switchHomeTab('icons')">Desktop icons</button><button data-tab="gallery" onclick="switchHomeTab('gallery')">Widget gallery</button><button data-tab="taskbar" onclick="switchHomeTab('taskbar')">Taskbar</button></div>
+    <div id="customizerWidgets" class="customizer-view"></div>
+    <div id="customizerIcons" class="customizer-view hidden"></div>
+    <div id="customizerGallery" class="customizer-view hidden"></div>
+    <div id="customizerTaskbar" class="customizer-view hidden"></div>
+    <div class="customizer-footer"><button onclick="resetHomeLayout()">Reset home layout</button><button onclick="toggleHomeEditMode()" id="homeEditButton">Enable edit mode</button><button class="primary-btn" onclick="closeHomeCustomizer()">Done</button></div>
+  </section>
+
+  <div id="notificationPanel" class="side-panel hidden"><div class="panel-head"><h3>Notifications</h3><button onclick="toggleNotifications()">×</button></div><div id="notificationList" class="panel-list">No new notifications.</div></div>
+  <div id="quickPanel" class="side-panel glass-panel hidden"><div class="panel-head"><h3>Quick settings</h3><button onclick="toggleQuickSettings()">×</button></div><div class="quick-radio-grid"><button onclick="toggleAliceRadio('wifi',true)"><span>⌁</span><b>Wi‑Fi</b><small>Turn on</small></button><button onclick="toggleAliceRadio('bluetooth',true)"><span>ᛒ</span><b>Bluetooth</b><small>Turn on</small></button><button onclick="toggleAliceAirplane(true)"><span>✈</span><b>Airplane mode</b><small>Turn on</small></button></div><button onclick="controlTab('connectivity');toggleQuickSettings()">Open Connectivity Center</button><button onclick="openWindow('settings');toggleQuickSettings()">Personalization</button><button onclick="openWindow('devices');toggleQuickSettings()">Devices & Locator</button><button onclick="openWindow('terminal');toggleQuickSettings()">Terminal</button><button onclick="runAliceDiagnostics();toggleQuickSettings()">System Diagnostics</button><button onclick="lockAlice();toggleQuickSettings()">Lock Alice</button></div>
+  <section id="systemSoftwarePanel" class="side-panel glass-panel hidden" aria-label="Software and System Center">
+<div class="panel-head"><h3>Software & System Center</h3><button onclick="closeSystemSoftwareCenter()">×</button></div>
+<p class="muted">Windows-style app management plus local system and network tools. Network access is controlled separately.</p>
+<div class="software-section"><b>Network</b><div id="networkInterfaces" class="panel-list compact-list">Loading adapters…</div><button onclick="loadNetworkInterfaces()">Refresh network operators</button></div>
+<div class="software-section"><b>Package managers</b><div id="managerList" class="panel-list compact-list">Checking…</div></div>
+<div class="software-section"><b>Install application</b><input id="packageId" placeholder="Package ID (example: Microsoft.VisualStudioCode)"><button class="primary-btn" onclick="installPackage()">Install with detected manager</button></div>
+<div class="software-section"><b>Installed applications</b><button onclick="packageList()">Refresh installed apps</button><pre id="packageOutput" class="software-output">No query yet.</pre></div>
+<div class="software-section"><b>Software updates</b><button onclick="packageUpgrade()">Check package updates</button><pre id="upgradeOutput" class="software-output">No update check yet.</pre></div>
+<div class="software-section"><b>Windows system features</b><div class="feature-grid"><span>Settings</span><span>File Explorer</span><span>Task Manager</span><span>Terminal</span><span>Network</span><span>Security</span><span>Personalization</span><span>Accessibility</span><span>Device Manager</span><span>Storage</span><span>Accounts</span><span>Backup & Recovery</span><span>Bluetooth</span><span>Wi‑Fi</span><span>Default Apps</span><span>Privacy</span><span>Windows Update</span></div></div>
+<p class="muted">Alice does not claim to replace licensed Windows components. It manages software available to the host OS and provides Alice-native equivalents.</p>
+</section>
+<section id="termuxTerminal" class="termux-terminal hidden" aria-label="Alice Termux Terminal">
+      <div id="termuxTabs" class="termux-tabs"><button class="termux-tab active" data-tab="1">alice@local:~</button><button class="termux-newtab" onclick="newTermuxTab()">＋</button></div>
+<header class="termux-head">
+        <div><b>alice@alice-os</b><span> • Termux-style local shell</span></div>
+        <button onclick="closeTermuxTerminal()" aria-label="Close terminal">×</button>
+      </header>
+      <div class="termux-toolbar">
+  <button onclick="termuxClear()">Clear</button>
+  <button onclick="termuxBridgeStatus()">Termux status</button>
+  <button onclick="termuxPrint('Nmap is restricted to localhost/127.0.0.1 in Alice OS.')">Nmap scope</button>
+</div>
+<div id="termuxOutput" class="termux-output">
+        <div>Welcome to Alice OS Terminal.</div>
+        <div>Offline-first local shell interface.</div>
+        <div>Type <b>help</b> for available safe commands.</div>
+      </div>
+      <form id="termuxForm" class="termux-form">
+        <span class="termux-prompt">$</span>
+        <input id="termuxInput" autocomplete="off" autocapitalize="none" spellcheck="false" placeholder="command">
+      </form>
+    </section>
+<section id="aliceCommandCenter" class="command-center glass-panel hidden" aria-label="Alice Command Center">
+      <div class="cc-head">
+        <div><span class="cc-kicker">ALICE OS</span><h2>Command Center</h2><p>Local control • Offline</p></div>
+        <button class="cc-close" onclick="closeAliceCommandCenter()" aria-label="Close">×</button>
+      </div>
+      <div class="cc-orb"><div class="cc-orb-core"></div></div>
+      <div id="ccStatus" class="cc-status">READY</div>
+      <form id="ccForm" class="cc-form">
+        <input id="ccInput" autocomplete="off" placeholder="Ask Alice or enter a local command…">
+        <button type="submit">Run</button>
+      </form>
+      <div class="cc-quick">
+        <button data-cmd="System status">System status</button>
+        <button data-cmd="Open Terminal">Terminal</button>
+        <button data-cmd="Open Settings">Settings</button>
+        <button data-cmd="Run diagnostics">Diagnostics</button>
+        <button data-cmd="Show skills">Skills</button>
+        <button data-cmd="Offline status">Offline</button>
+      </div>
+      <div id="ccResponse" class="cc-response">Alice is ready.</div>
+    </section>
+<div id="skillDispatchPanel" class="side-panel glass-panel hidden"><div class="panel-head"><h3>Skill Dispatch</h3><button onclick="document.getElementById('skillDispatchPanel').classList.add('hidden')">×</button></div><p class="muted">Local command routing for Alice skills.</p><input id="skillDispatchInput" placeholder="Try: system status" autocomplete="off"><button class="primary-btn" onclick="dispatchAliceSkill(document.getElementById('skillDispatchInput').value)">Run local skill</button><div id="skillDispatchResult" class="panel-list"></div></div>
+<div id="accountsCenter" class="side-panel glass-panel hidden"><div class="panel-head"><h3>Accounts & Security</h3><button onclick="closeAccountsCenter()">×</button></div><div id="accountStatus" class="panel-list">Loading…</div><button class="primary-btn" onclick="setPassword()">Change owner password</button><button class="primary-btn" onclick="openWindow('security');closeAccountsCenter()">Security Lab</button><div class="section-divider"></div><h4>Startup</h4><label class="toggle-row"><span>Launch Alice on start</span><input id="startupLaunch" type="checkbox"></label><label class="toggle-row"><span>Restore previous windows</span><input id="startupRestore" type="checkbox"></label><label class="toggle-row"><span>Start locked</span><input id="startupLocked" type="checkbox"></label><button class="primary-btn" onclick="saveAliceStartup()">Save startup settings</button></div>
+<div id="actionCenter" class="side-panel glass-panel hidden"><div class="panel-head"><h3>Action Center</h3><button onclick="closeActionCenter()">×</button></div><div class="panel-row"><span class="muted">Local notifications and system events</span><button onclick="clearActionCenter()">Clear</button></div><div id="actionCenterList" class="panel-list">Loading…</div></div>
+<div id="recoveryCenter" class="side-panel glass-panel hidden"><div class="panel-head"><h3>Backup & Recovery</h3><button onclick="closeRecoveryCenter()">×</button></div><p class="muted">Local recovery information for this Alice installation.</p><button class="primary-btn" onclick="createAliceBackup();loadRecoveryCenter()">Create backup</button><div id="recoveryList" class="panel-list">Loading…</div></div>
+<div id="toastArea"></div><div id="windows"></div>
+</div>
+
+<div id="skillsPanel" class="side-panel glass-panel hidden"><div class="panel-head"><h3>Skill Hub</h3><button onclick="togglePanel('skillsPanel')">×</button></div><div id="skillsList" class="panel-list"></div></div>
+<div id="securityPanel" class="side-panel glass-panel hidden"><div class="panel-head"><h3>Security Lab</h3><button onclick="togglePanel('securityPanel')">×</button></div><button class="primary-btn" onclick="runSecurityAudit()">Run Local Audit</button><div id="securityResults" class="panel-list"></div></div>
+<div id="backupPanel" class="side-panel glass-panel hidden"><div class="panel-head"><h3>Alice Backup</h3><button onclick="togglePanel('backupPanel')">×</button></div><p class="muted">Create a local backup of Alice settings and authentication metadata.</p><button class="primary-btn" onclick="createAliceBackup()">Create Backup</button><div id="backupResult" class="panel-list"></div></div>
+<div id="wallpaperPanel" class="side-panel glass-panel hidden"><div class="panel-head"><h3>Wallpaper Gallery</h3><button onclick="togglePanel('wallpaperPanel')">×</button></div><div id="wallpaperList" class="wallpaper-grid"></div></div>
+<div id="fileExplorerPanel" class="side-panel glass-panel hidden"><div class="panel-head"><h3>File Explorer</h3><button onclick="togglePanel('fileExplorerPanel')">×</button></div><div class="explorer-actions"><button class="primary-btn" onclick="createAliceFolder()">New Folder</button><button class="primary-btn" onclick="createAliceTextFile()">New Text File</button></div><div id="explorerList" class="panel-list"></div></div>
+<div id="controlPanel" class="side-panel glass-panel hidden"><div class="panel-head"><h3>System Control Center</h3><button onclick="closeControlCenter()">×</button></div><p class="muted">Windows-style local controls for tasks, networking, devices and software updates.</p><div class="control-tabs"><button onclick="controlTab('tasks')">Task Manager</button><button onclick="controlTab('network')">Network</button><button onclick="controlTab('devices')">Device Manager</button><button onclick="controlTab('storage')">Storage</button><button onclick="controlTab('connectivity')">Wi‑Fi/Bluetooth</button><button onclick="controlTab('updates')">Updates</button></div><button onclick="controlTab('supervisor')">Alice Supervisor</button></div><div id="controlTasks" class="control-view">
+<div class="taskmgr-toolbar"><div><b>Task Manager</b><small id="taskManagerMode">Local processes</small></div><div class="taskmgr-actions"><button class="primary-btn" onclick="refreshTaskManager()">Refresh</button><button onclick="openTaskManagerFull()">Open full view</button></div></div>
+<div class="taskmgr-tabs"><button class="active" data-tm-tab="processes" onclick="switchTaskManagerTab('processes')">Processes</button><button data-tm-tab="performance" onclick="switchTaskManagerTab('performance')">Performance</button><button data-tm-tab="users" onclick="switchTaskManagerTab('users')">Users</button><button data-tm-tab="details" onclick="switchTaskManagerTab('details')">Details</button><button data-tm-tab="services" onclick="switchTaskManagerTab('services')">Services</button><button data-tm-tab="startup" onclick="switchTaskManagerTab('startup')">Startup apps</button></div>
+<div id="tmProcesses" class="tm-tab"><div id="taskSummary" class="muted">Loading…</div><div class="task-table-head"><span>Name</span><span>PID</span><span>CPU</span><span>Memory</span><span>Status</span><span>Action</span></div><div id="taskList" class="control-list"></div></div>
+<div id="tmPerformance" class="tm-tab hidden"><div class="tm-performance-grid"><div class="tm-meter"><b>CPU</b><strong id="tmCpu">--</strong><i id="tmCpuBar"></i></div><div class="tm-meter"><b>Memory</b><strong id="tmRam">--</strong><i id="tmRamBar"></i></div><div class="tm-meter"><b>Storage</b><strong id="tmStorage">--</strong><i id="tmStorageBar"></i></div><div class="tm-meter"><b>Network</b><strong id="tmNetwork">--</strong><i id="tmNetworkBar"></i></div></div><p class="muted">Performance data is read from this Alice OS host. No remote monitoring is performed.</p></div>
+<div id="tmUsers" class="tm-tab hidden"><div id="tmUsersList" class="control-list"></div></div>
+<div id="tmDetails" class="tm-tab hidden"><div id="tmDetailsList" class="control-list"></div></div>
+<div id="tmServices" class="tm-tab hidden"><div id="tmServicesList" class="control-list"></div></div>
+<div id="tmStartup" class="tm-tab hidden"><div id="tmStartupList" class="control-list"></div><button class="primary-btn" onclick="openAccountsCenter()">Manage startup preferences</button></div>
+</div><div id="controlNetwork" class="control-view hidden"><div class="panel-row"><b>Network operators</b><button class="primary-btn" onclick="refreshControlNetwork()">Refresh</button></div><div id="networkControlInfo" class="control-list"></div></div><div id="controlDevices" class="control-view hidden"><div class="panel-row"><b>Device Manager</b><button class="primary-btn" onclick="refreshDeviceManager()">Refresh</button></div><p class="muted">Read-only inventory of hardware and adapters detected by the host OS.</p><div id="deviceList" class="control-list"></div></div><div id="controlStorage" class="control-view hidden"><div class="panel-row"><b>Storage Manager</b><button class="primary-btn" onclick="refreshStorageManager()">Refresh</button></div><div id="storageList" class="control-list"></div></div><div id="controlConnectivity" class="control-view hidden"><div class="panel-row"><b>Connectivity</b><button class="primary-btn" onclick="refreshConnectivity()">Refresh</button></div><div id="connectivityList" class="control-list"></div></div><div id="controlUpdates" class="control-view hidden"><div class="panel-row"><b>System & app updates</b><button class="primary-btn" onclick="refreshUpdateCenter()">Check</button></div><div id="updateInfo" class="control-list"></div><button class="primary-btn" onclick="openSoftwareCenter();closeControlCenter()">Open Software Center</button></div><div id="controlSupervisor" class="control-view hidden"><div class="panel-row"><b>Alice System Supervisor</b><button class="primary-btn" onclick="refreshSupervisor()">Refresh</button></div><div class="control-card"><b>Proactive local assistance</b><p class="muted">Alice watches local health, security events and configured permission preferences. It does not silently change system files or install updates.</p></div><div id="supervisorStatus" class="control-list">Loading…</div><div class="control-card"><b>Alice Event Engine</b><p class="muted">Correlates local health and security events and provides informational recommendations. Alice never performs destructive actions automatically.</p><div id="eventRecommendations" class="control-list">Loading recommendations…</div><button class="primary-btn" onclick="openActionCenter()">Open Alice Action Center</button><button class="primary-btn" onclick="openAliceDashboard()">Open System Dashboard</button><div id="eventTimeline" class="control-list">Loading event timeline…</div></div><div class="supervisor-grid"><label class="toggle-row"><span>Supervisor enabled</span><input id="supEnabled" type="checkbox"></label><label class="toggle-row"><span>Health notifications</span><input id="supHealth" type="checkbox"></label><label class="toggle-row"><span>Security notifications</span><input id="supSecurity" type="checkbox"></label><label class="toggle-row"><span>Update notifications</span><input id="supUpdates" type="checkbox"></label><label class="toggle-row"><span>Desktop notifications</span><input id="supDesktop" type="checkbox"></label><label class="toggle-row"><span>App-launch permission</span><input id="supLaunch" type="checkbox"></label><label class="toggle-row"><span>Camera permission</span><input id="supCamera" type="checkbox"></label><label class="toggle-row"><span>Microphone permission</span><input id="supMic" type="checkbox"></label><label class="toggle-row"><span>Location permission</span><input id="supLocation" type="checkbox"></label></div><button class="primary-btn" onclick="saveSupervisor()">Save supervisor & permissions</button><div class="control-card"><b>Permission note</b><small>These controls record Alice's consent preferences. Browser and host operating-system permission dialogs remain authoritative.</small></div></div></div><div id="actionCenterPanel" class="side-panel glass-panel hidden"><div class="panel-head"><h3>Alice Action Center</h3><button onclick="closeActionCenter()">×</button></div><p class="muted">Local recommendations and owner-approved actions. Nothing destructive runs automatically.</p><div id="actionCenterList" class="control-list">Loading…</div><div class="control-card"><b>Alice Automation</b><p class="muted">Run owner-approved local workflows. Alice previews the purpose and only runs the selected workflow after you press Run.</p><div id="workflowList" class="control-list">Loading workflows…</div><div id="workflowResult" class="control-card hidden"></div></div><div class="control-card"><b>Quick actions</b><div class="supervisor-grid"><button class="primary-btn" onclick="actionCenterRun('task_manager')">Task Manager</button><button class="primary-btn" onclick="actionCenterRun('storage')">Storage</button><button class="primary-btn" onclick="actionCenterRun('security')">Security</button><button class="primary-btn" onclick="actionCenterRun('updates')">Updates</button><button class="primary-btn" onclick="actionCenterRun('lock')">Lock Alice</button></div></div></div><div id="aliceDashboardPanel" class="side-panel glass-panel hidden"><div class="panel-head"><h3>Alice System Dashboard</h3><button onclick="closeAliceDashboard()">×</button></div><p class="muted">Live local view of system health, security, permissions, events, actions and workflows.</p><div class="dashboard-grid"><div class="dashboard-card"><span>CPU</span><b id="dashCpu">—</b></div><div class="dashboard-card"><span>RAM</span><b id="dashRam">—</b></div><div class="dashboard-card"><span>Storage</span><b id="dashStorage">—</b></div><div class="dashboard-card"><span>Health</span><b id="dashHealth">—</b></div></div><div id="dashDetails" class="control-list">Loading…</div><div class="panel-row"><button class="primary-btn" onclick="controlTab('supervisor');closeAliceDashboard()">Supervisor</button><button class="primary-btn" onclick="openActionCenter();closeAliceDashboard()">Action Center</button><button class="primary-btn" onclick="controlTab('updates');closeAliceDashboard()">Updates</button></div></div><div id="aliceAssistantPanel" class="side-panel glass-panel hidden assistant-panel" aria-label="Alice Assistant" role="dialog" aria-modal="true"><div class="panel-head"><h3>Alice Assistant</h3><button onclick="closeAliceAssistant()" aria-label="Close">×</button></div><div class="assistant-hero"><div class="assistant-mini-orb"><img src="/assets/alice-logo.svg" alt="Alice OS"></div><div><b>Local intelligence</b><p class="muted">Alice can explain your system status, security, events, recommendations and workflows. Responses stay on this PC.</p></div></div><div class="assistant-chips"><button onclick="askAlicePreset('Give me a system status report')">System status</button><button onclick="askAlicePreset('Show security status')">Security</button><button onclick="askAlicePreset('Show recent events')">Events</button><button onclick="askAlicePreset('What should I check?')">Recommendations</button></div><div id="assistantTranscript" class="assistant-transcript" aria-live="polite"><div class="assistant-message alice"><b>Alice</b><span>Ready. Ask me about this PC.</span></div></div><form id="assistantForm" class="assistant-input-row"><input id="assistantInput" autocomplete="off" placeholder="Ask Alice about your system…" aria-label="Ask Alice"><button class="primary-btn" type="submit">Send</button></form><div class="assistant-foot"><span>● Offline</span><span>127.0.0.1</span><span>Owner-controlled</span></div></div><div id="aliceIntelligenceCore" class="side-panel glass-panel hidden ai-core-panel" aria-label="Alice Intelligence Core" role="dialog" aria-modal="true">
+  <div class="panel-head"><h3>Alice Intelligence Core</h3><button onclick="closeAliceIntelligenceCore()" aria-label="Close">×</button></div>
+  <div class="ai-core-hero"><div class="ai-core-orb">A</div><div><b>FRIDAY orchestration</b><p class="muted">Local-first intelligence with optional GPT and Claude providers. Cloud providers stay disabled until the owner enables network AI.</p></div></div>
+  <div class="ai-provider-grid">
+    <div class="ai-provider-card"><b>GPT</b><span id="aiOpenAIStatus">Not configured</span></div>
+    <div class="ai-provider-card"><b>Claude</b><span id="aiAnthropicStatus">Not configured</span></div>
+    <div class="ai-provider-card"><b>Defensive Security AI</b><span id="aiSecurityStatus">Local only</span></div>
+    <div class="ai-provider-card"><b>FRIDAY</b><span id="aiFridayStatus">Active</span></div>
+  </div>
+  <div class="ai-settings-grid">
+    <label class="toggle-row"><span>Allow network AI</span><input id="aiNetworkEnabled" type="checkbox"></label>
+    <label class="toggle-row"><span>Use GPT</span><input id="aiOpenAIEnabled" type="checkbox"></label>
+    <label class="toggle-row"><span>Use Claude</span><input id="aiAnthropicEnabled" type="checkbox"></label>
+    <label class="toggle-row"><span>Defensive Security AI</span><input id="aiSecurityEnabled" type="checkbox" checked></label>
+  </div>
+  <div class="ai-model-row"><label>GPT model <input id="aiOpenAIModel" value="gpt-5.6-luna"></label><label>Claude model <input id="aiAnthropicModel" value="claude-sonnet-5"></label><label>Security AI model <input id="aiSecurityModel" value="gpt-5.6-cyber"></label><label>FRIDAY routing <select id="aiRoutingMode"><option value="friday-smart">Smart routing</option><option value="provider-order">Provider order</option></select></label></div>
+  <div class="ai-actions"><button class="primary-btn" onclick="saveAliceAIConfig()">Save intelligence settings</button><button class="primary-btn" onclick="runAliceSecurityReview()">Run local security review</button></div>
+  <div class="control-card cyber-lab-card">
+  <div class="panel-row"><div><b>Ethical Security Workbench</b><p class="muted">Owner-authorized defensive tools. Network probes are restricted to 127.0.0.1; workspace and lab analysis stays local.</p></div><div class="cyber-actions"><button class="primary-btn" onclick="loadCyberTools()">Load tools</button><button class="primary-btn" onclick="refreshCyberToolStatus()">Tool status</button></div></div>
+  <div id="cyberStatusGrid" class="cyber-status-grid"><span>Tool availability not checked yet.</span></div>
+  <div class="cyber-section-title"><b>Security Workbench</b><small>Recon • Web Security • Code • Malware • Network • Password Audit</small></div>
+  <div id="cyberToolsGrid" class="feature-grid"><span>Loading defensive tools…</span></div>
+  <pre id="cyberToolOutput" class="software-output">Select a tool to run it.</pre>
+</div>
+  <div id="aiSecurityReview" class="control-card hidden"></div>
+  <div class="ai-chat-box"><div id="aiCoreTranscript" class="assistant-transcript" aria-live="polite"><div class="assistant-message alice"><b>FRIDAY</b><span>Intelligence Core online. Ask a question or request a system explanation.</span></div></div><form id="aiCoreForm" class="assistant-input-row"><input id="aiCoreInput" autocomplete="off" placeholder="Ask the Intelligence Core…" aria-label="Ask the Intelligence Core"><button class="primary-btn" type="submit">Send</button></form></div>
+  <div class="assistant-foot"><span>Local-first</span><span>Owner-controlled</span><span id="aiNetworkFoot">Network AI OFF</span></div>
+</div>
+
+<div id="aliceCloudPanel" class="side-panel glass-panel hidden cloud-panel" aria-label="Alice Cloud">
+  <div class="panel-head"><div><h3>Alice Cloud</h3><small class="muted">Memory • Process history • Schedule</small></div><button onclick="closeAliceCloud()">×</button></div>
+  <div class="cloud-banner"><div class="cloud-orb">☁</div><div><b>Cloud Vault</b><p class="muted">Local-first storage. Your data stays on this PC unless you explicitly enable a trusted sync service.</p></div></div>
+  <div class="cloud-stats" id="cloudStats"></div>
+  <div class="cloud-tabs"><button onclick="cloudTab('memory')">Memory</button><button onclick="cloudTab('process')">Processes</button><button onclick="cloudTab('schedule')">Schedule</button></div>
+  <section id="cloudMemoryTab" class="cloud-tab">
+    <div class="cloud-compose"><textarea id="cloudMemoryText" placeholder="Tell Alice something to remember…"></textarea><input id="cloudMemoryTags" placeholder="Tags (optional)"><button class="primary-btn" onclick="saveCloudMemory()">Save to Cloud</button></div>
+    <div id="cloudMemoryList" class="panel-list">Loading…</div>
+  </section>
+  <section id="cloudProcessTab" class="cloud-tab hidden"><div id="cloudProcessList" class="panel-list">Loading…</div></section>
+  <section id="cloudScheduleTab" class="cloud-tab hidden">
+    <div class="cloud-compose schedule-form"><input id="cloudScheduleTitle" placeholder="Reminder title"><input id="cloudScheduleNote" placeholder="What should Alice remind you about?"><input id="cloudScheduleTime" type="datetime-local"><select id="cloudScheduleRepeat"><option value="none">Once</option><option value="daily">Daily</option><option value="weekly">Weekly</option></select><button class="primary-btn" onclick="saveCloudSchedule()">Schedule</button></div>
+    <div id="cloudScheduleList" class="panel-list">Loading…</div>
+  </section>
+</div>
+
+<div id="aliceInternetPanel" class="side-panel glass-panel hidden" aria-label="Alice Internet"><div class="panel-head"><h3>Alice Internet</h3><button onclick="closeAliceInternet()">×</button></div><div class="internet-hero"><div class="assistant-mini-orb"><img src="/assets/alice-logo.svg" alt="Alice OS"></div><div><b>Online web access</b><p id="aliceInternetState" class="muted">Checking connection…</p></div></div><div class="internet-search-row"><input id="aliceInternetQuery" placeholder="Search the web…" autocomplete="off"><button class="primary-btn" onclick="searchAliceInternet()">Search</button></div><div class="internet-actions"><button onclick="navigateAliceInternet('https://duckduckgo.com/')">DuckDuckGo</button><button onclick="navigateAliceInternet('https://www.google.com/')">Google</button></div><div id="aliceInternetNotice" class="control-card">Alice Internet is a network-dependent capability. The rest of Alice OS remains available offline.</div></div>
+<div id="softwarePanel" class="side-panel glass-panel hidden"><div class="panel-head"><h3>Software Center</h3><button onclick="closeSoftwareCenter()">×</button></div><p class="muted">Download apps and software from public HTTP/HTTPS sources. Network access is off by default.</p><div class="network-status-card"><b>Network access</b><span id="networkStateText">Checking…</span><button id="networkToggle" class="primary-btn" onclick="toggleAliceNetwork()">Enable</button></div><input id="softwareUrl" placeholder="https://example.com/app.zip" autocomplete="off"><input id="softwareName" placeholder="Optional filename (e.g. app.zip)" autocomplete="off"><input id="softwareSha" placeholder="Optional SHA-256 checksum" autocomplete="off"><button class="primary-btn" onclick="downloadSoftware()">Download</button><div id="downloadResult" class="panel-list"></div><h4>Downloads</h4><div id="downloadList" class="panel-list"></div><p class="muted">Alice saves downloads locally and does not automatically execute installers. Review files before opening them.</p></div>
+<script src="app.js"></script>
+</body></html>

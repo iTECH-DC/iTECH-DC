@@ -1,0 +1,12 @@
+{
+  "enabled": true,
+  "permission_notifications": true,
+  "update_notifications": true,
+  "health_notifications": true,
+  "security_notifications": true,
+  "camera_permission": false,
+  "microphone_permission": false,
+  "location_permission": false,
+  "desktop_notifications": true,
+  "app_launch_permission": true
+}

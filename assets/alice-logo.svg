@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Alice OS logo">
+  <defs>
+    <linearGradient id="g1" x1="18" y1="235" x2="116" y2="20" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#1685ff"/><stop offset="0.55" stop-color="#54d8ff"/><stop offset="1" stop-color="#d7fbff"/>
+    </linearGradient>
+    <linearGradient id="g2" x1="105" y1="24" x2="226" y2="232" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#e9ffff"/><stop offset="0.32" stop-color="#62dcff"/><stop offset="0.72" stop-color="#168cff"/><stop offset="1" stop-color="#0751d5"/>
+    </linearGradient>
+    <linearGradient id="g3" x1="66" y1="166" x2="192" y2="166" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#2aa7ff"/><stop offset="0.5" stop-color="#b9f6ff"/><stop offset="1" stop-color="#0870ec"/>
+    </linearGradient>
+    <filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="7" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+  </defs>
+  <g filter="url(#glow)">
+    <path d="M42 226 111 31c5-14 25-14 31 0l71 195h-47l-17-51H107l-17 51H42Zm78-93h19l-10-33-9 33Z" fill="url(#g1)"/>
+    <path d="M111 31c6-14 25-14 31 0l71 195h-47l-17-51-22-67-16 52h-4l-16-52 20-77Z" fill="url(#g2)" opacity=".96"/>
+    <path d="M70 171h117l10 27H60l10-27Z" fill="url(#g3)"/>
+  </g>
+</svg>
