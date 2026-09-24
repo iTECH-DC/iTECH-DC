@@ -42,7 +42,7 @@ from alice_core.security.auth import Auth
 from alice_core.terminal.runner import run_command
 from alice_core.skills.registry import get_skills
 from alice_core.locator.locator import get_location_status, get_location_map, set_sharing, set_self_location, add_shared_contact, remove_contact
-from alice_core.intelligence.core import provider_status, save_config as save_ai_config, config as ai_config, ask as ai_ask, defensive_security_review
+from alice_core.intelligence.core import provider_status, save_config as save_ai_config, config as ai_config, ask as ai_ask, defensive_security_review, resolve_online as ai_resolve_online, effective_mode as ai_effective_mode
 from alice_core.intelligence.cyber_lab import TOOLS as CYBER_TOOLS, run_tool as run_cyber_tool, tool_status as cyber_tool_status
 from alice_core.cloud_vault import init as cloud_init, snapshot as cloud_snapshot, add_memory as cloud_add_memory, memories as cloud_memories, record_event as cloud_record_event, events as cloud_events, add_schedule as cloud_add_schedule, schedules as cloud_schedules, delete_schedule as cloud_delete_schedule, set_schedule_enabled as cloud_set_schedule_enabled, start_scheduler as cloud_start_scheduler
 from alice_core.cloud_sync import init as cloud_sync_init, status as cloud_sync_status, configure as cloud_sync_configure, disable as cloud_sync_disable, push as cloud_sync_push, pull as cloud_sync_pull
@@ -290,6 +290,31 @@ def network_status():
         "interfaces": interfaces,
         "probe_error": probe_error,
         "downloads": str(DOWNLOADS.relative_to(ROOT)).replace("\\", "/")
+    }
+
+def ai_network_quality():
+    """Cached-ish network quality string for AI routing ('online'/'moderate'/'offline')."""
+    try:
+        return str(network_status().get("quality", "offline"))
+    except Exception:
+        return "offline"
+
+def ai_parity_snapshot():
+    """Single source of truth for the online/offline AI parity state."""
+    quality = ai_network_quality()
+    enabled = bool(network_state.get("enabled", False))
+    status = provider_status(enabled, quality)
+    return {
+        "ok": True,
+        "online": ai_resolve_online(enabled, quality),
+        "quality": quality,
+        "mode": ai_effective_mode(enabled, quality),
+        "auto_online_ai": status.get("auto_online_ai"),
+        "cloud_ready": status.get("cloud_ready"),
+        "provider_ready": status.get("provider_ready"),
+        "parity": True,
+        "offline_engine": "offline-brain",
+        "detail": status,
     }
 
 def _public_host(host):
@@ -864,9 +889,9 @@ def local_intelligence(text):
         checks={"ui":UI.exists(),"data":DATA.exists(),"auth_file":AUTH_FILE.exists(),"offline_mode":ALICE_OFFLINE_MODE,"loopback_only":ALICE_BIND_HOST=="127.0.0.1"}
         return result("diagnostics", "Local diagnostics completed.", data={"ok":all(checks.values()),"checks":checks})
     try:
-        ai = ai_ask(raw, context={"local_system": system_snapshot()}, network_enabled=network_state.get("enabled",False), audit={"checks":[]})
+        ai = ai_ask(raw, context={"local_system": system_snapshot()}, network_enabled=network_state.get("enabled",False), audit={"checks":[]}, quality=ai_network_quality())
         if ai.get("provider") != "friday" or ai.get("answer"):
-            return result("ai", ai.get("answer", "I could not produce an answer."), provider=ai.get("provider"), data=ai.get("data",{}), errors=ai.get("errors",[]))
+            return result("ai", ai.get("answer", "I could not produce an answer."), provider=ai.get("provider"), mode=ai.get("mode"), data=ai.get("data",{}), errors=ai.get("errors",[]))
     except Exception:
         pass
     return result("unknown", "I can handle local Alice commands, but that request is not connected to a local skill yet.")
@@ -1344,7 +1369,9 @@ class AliceHandler(SimpleHTTPRequestHandler):
         if self.path == "/api/alice-assistant/status":
             return self.send_json({"ok": True, "version": VERSION, "offline": ALICE_OFFLINE_MODE, "bind_host": ALICE_BIND_HOST, "capabilities": ["system status", "security status", "event timeline", "recommendations", "workflows", "local diagnostics"]})
         if self.path == "/api/ai/status":
-            return self.send_json(provider_status(network_state.get("enabled", False)))
+            return self.send_json(provider_status(network_state.get("enabled", False), ai_network_quality()))
+        if self.path == "/api/ai/parity":
+            return self.send_json(ai_parity_snapshot())
         if self.path == "/api/internet/status":
             cap = capability_snapshot(network_status())
             return self.send_json({"ok": True, "available": cap["internet_available"], "mode": cap["mode"], "message": "Alice Internet is available." if cap["internet_available"] else "Alice Internet is unavailable while Alice is offline."})
@@ -1663,11 +1690,11 @@ class AliceHandler(SimpleHTTPRequestHandler):
         if self.path == "/api/ai/config":
             data=self.read_json()
             cfg=save_ai_config(data if isinstance(data,dict) else {})
-            return self.send_json({"ok":True,"config":cfg,"status":provider_status(network_state.get("enabled",False))})
+            return self.send_json({"ok":True,"config":cfg,"status":provider_status(network_state.get("enabled",False), ai_network_quality())})
         if self.path == "/api/ai/query":
             data=self.read_json(); prompt=str(data.get("text","")).strip()
             context=data.get("context") if isinstance(data.get("context"),dict) else {}
-            result=ai_ask(prompt,context=context,network_enabled=network_state.get("enabled",False),audit={"checks":context.get("security_checks",[])})
+            result=ai_ask(prompt,context=context,network_enabled=network_state.get("enabled",False),audit={"checks":context.get("security_checks",[])},quality=ai_network_quality())
             return self.send_json(result)
         if self.path == "/api/security/config":
             data=self.read_json(); cfg=security_config()

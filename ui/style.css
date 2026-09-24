@@ -409,3 +409,95 @@ body{background:#020b19}
 .internet-hero{display:flex;gap:14px;align-items:center;padding:14px;border:1px solid rgba(255,255,255,.1);border-radius:18px;margin-bottom:14px;background:rgba(255,255,255,.04)}
 .internet-search-row{display:flex;gap:8px;margin-bottom:10px}.internet-search-row input{flex:1}.internet-actions{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px}.internet-actions button{padding:10px 14px;border-radius:12px;border:1px solid rgba(255,255,255,.12);background:rgba(255,255,255,.06);color:inherit;cursor:pointer}
 .offline-badge.online{opacity:.95}
+
+/* ============================================================
+   Alice OS 13.6 — Online/Offline AI Parity banner
+   ============================================================ */
+.ai-parity-banner{display:flex;align-items:center;gap:11px;margin:4px 0 12px;padding:11px 13px;border-radius:13px;border:1px solid rgba(95,190,255,.22);background:rgba(255,255,255,.04);position:relative;overflow:hidden;transition:border-color .25s,background .25s}
+.ai-parity-banner::after{content:"";position:absolute;inset:0;background:linear-gradient(90deg,transparent,rgba(120,200,255,.08),transparent);transform:translateX(-100%);animation:aiParitySweep 3.4s ease-in-out infinite;pointer-events:none}
+@keyframes aiParitySweep{0%{transform:translateX(-100%)}55%,100%{transform:translateX(100%)}}
+.ai-parity-dot{width:11px;height:11px;border-radius:50%;flex:0 0 11px;background:#8090a0;box-shadow:0 0 0 rgba(0,0,0,0);transition:background .25s,box-shadow .25s}
+.ai-parity-dot.on{background:#4be08a;box-shadow:0 0 12px #4be08a;animation:aiParityPulse 1.8s ease-in-out infinite}
+.ai-parity-dot.off{background:#f4c84a;box-shadow:0 0 10px rgba(244,200,74,.7)}
+@keyframes aiParityPulse{0%,100%{opacity:1}50%{opacity:.45}}
+.ai-parity-text{flex:1;min-width:0}
+.ai-parity-text b{display:block;font-size:11.5px;letter-spacing:.2px}
+.ai-parity-text small{display:block;font-size:9px;opacity:.6;margin-top:2px}
+.ai-parity-banner[data-mode="online-ai"]{border-color:rgba(75,224,138,.45);background:rgba(75,224,138,.09)}
+.ai-parity-banner[data-mode="online-ai"] .ai-parity-text b{color:#8cf5b6}
+.ai-parity-banner[data-mode="online-local"]{border-color:rgba(244,200,74,.4);background:rgba(244,200,74,.08)}
+.ai-parity-banner[data-mode="online-local"] .ai-parity-text b{color:#ffdf8a}
+.ai-parity-banner[data-mode="offline-local"]{border-color:rgba(120,180,255,.32);background:rgba(120,180,255,.07)}
+.ai-parity-banner[data-mode="offline-local"] .ai-parity-text b{color:#a9d4ff}
+
+/* ============================================================
+   Alice OS 13.6 — Ethical Security Workbench (cyberpunk console)
+   ============================================================ */
+.cyber-console{position:relative;margin-top:16px;padding:0;border-radius:16px;overflow:hidden;border:1px solid rgba(64,224,168,.28);background:radial-gradient(circle at 12% 0%,rgba(20,70,60,.5),rgba(2,12,20,.96) 60%),#030d14;box-shadow:0 0 0 1px rgba(0,0,0,.4),0 22px 60px rgba(0,0,0,.45),inset 0 0 90px rgba(20,120,90,.07)}
+.cyber-console::before{content:"";position:absolute;inset:0;background-image:linear-gradient(rgba(64,224,168,.05) 1px,transparent 1px),linear-gradient(90deg,rgba(64,224,168,.05) 1px,transparent 1px);background-size:26px 26px;pointer-events:none;opacity:.5}
+.cyber-scanline{position:absolute;left:0;right:0;top:0;height:120px;background:linear-gradient(180deg,rgba(64,224,168,.14),transparent);pointer-events:none;animation:cyberScan 5.5s linear infinite;z-index:1}
+@keyframes cyberScan{0%{transform:translateY(-120px)}100%{transform:translateY(1400px)}}
+.cyber-console-head{position:relative;z-index:2;display:flex;justify-content:space-between;align-items:center;gap:10px;padding:13px 14px;border-bottom:1px solid rgba(64,224,168,.2);background:linear-gradient(180deg,rgba(20,60,52,.55),rgba(4,16,22,.2))}
+.cyber-console-title{display:flex;align-items:center;gap:11px}
+.cyber-shield{width:34px;height:34px;border-radius:9px;display:grid;place-items:center;font-size:17px;color:#04221a;background:linear-gradient(145deg,#6affc0,#12b981);box-shadow:0 0 18px rgba(64,224,168,.6)}
+.cyber-console-title b{display:block;font-size:12px;letter-spacing:2.4px;color:#c8ffe6;font-family:Consolas,"SFMono-Regular",monospace}
+.cyber-console-title small{display:block;font-size:8.5px;letter-spacing:1px;color:#4fd6a4;opacity:.8;margin-top:2px;text-transform:uppercase}
+.cyber-console-badges{display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end}
+.cyber-badge{font-family:Consolas,monospace;font-size:8px;letter-spacing:1.4px;padding:4px 8px;border-radius:6px;border:1px solid rgba(64,224,168,.4);color:#7dffc9;background:rgba(64,224,168,.09)}
+.cyber-badge.authorized{color:#04221a;background:linear-gradient(145deg,#6affc0,#12b981);border-color:transparent;font-weight:700}
+.cyber-badge.scope{color:#ffd97a;border-color:rgba(255,210,120,.4);background:rgba(255,210,120,.08)}
+.cyber-marquee{position:relative;z-index:2;overflow:hidden;white-space:nowrap;padding:6px 0;border-bottom:1px solid rgba(64,224,168,.14);background:rgba(0,0,0,.28)}
+.cyber-marquee span{display:inline-block;padding-left:100%;font-family:Consolas,monospace;font-size:9px;letter-spacing:1.6px;color:#3fbf8f;animation:cyberMarquee 26s linear infinite}
+@keyframes cyberMarquee{0%{transform:translateX(0)}100%{transform:translateX(-100%)}}
+.cyber-toolbar{position:relative;z-index:2;display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;padding:11px 14px 4px}
+.cyber-tabs{display:flex;gap:6px;flex-wrap:wrap}
+.cyber-tab{font-family:Consolas,monospace;font-size:9.5px;letter-spacing:.6px;text-transform:uppercase;padding:6px 10px;border-radius:7px;border:1px solid rgba(64,224,168,.22);background:rgba(255,255,255,.03);color:#5fbf9a;cursor:pointer;transition:all .16s}
+.cyber-tab:hover{border-color:rgba(64,224,168,.5);color:#9dffd0}
+.cyber-tab.active{background:linear-gradient(145deg,rgba(64,224,168,.22),rgba(20,120,90,.14));border-color:rgba(64,224,168,.65);color:#c8ffe6;box-shadow:0 0 14px rgba(64,224,168,.25)}
+.cyber-mini-btn{font-family:Consolas,monospace;font-size:9px;letter-spacing:.5px;padding:6px 9px;border-radius:7px;border:1px solid rgba(64,224,168,.28);background:rgba(64,224,168,.07);color:#8ff3c6;cursor:pointer;transition:all .16s}
+.cyber-mini-btn:hover{background:rgba(64,224,168,.16);border-color:rgba(64,224,168,.55)}
+.cyber-actions{display:flex;gap:6px;flex-wrap:wrap}
+.cyber-empty{display:block;padding:14px;font-family:Consolas,monospace;font-size:10px;color:#3f9c7d;text-align:center}
+.cyber-status-grid{position:relative;z-index:2;display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:7px;padding:8px 14px}
+.cyber-status-card{display:flex;align-items:center;gap:8px;padding:8px 10px;border-radius:10px;border:1px solid rgba(64,224,168,.16);background:rgba(255,255,255,.025);transition:all .16s}
+.cyber-status-card.is-on{border-color:rgba(64,224,168,.4);background:rgba(64,224,168,.07)}
+.cyber-status-card.is-off{opacity:.62}
+.cyber-status-card b{display:block;font-size:10px;color:#c8ffe6;font-family:Consolas,monospace}
+.cyber-status-card small{display:block;font-size:8px;color:#4fd6a4;opacity:.75;margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:130px}
+.cyber-dot{width:8px;height:8px;border-radius:50%;flex:0 0 8px}
+.cyber-dot.on{background:#4be08a;box-shadow:0 0 10px #4be08a}
+.cyber-dot.off{background:#5a6b72;box-shadow:none}
+.cyber-section-title{position:relative;z-index:2;display:flex;justify-content:space-between;align-items:flex-end;margin:6px 14px 8px;padding-top:8px;border-top:1px solid rgba(64,224,168,.14)}
+.cyber-section-title b{font-size:11px;letter-spacing:1.4px;color:#9dffd0;font-family:Consolas,monospace;text-transform:uppercase}
+.cyber-section-title small{font-size:8.5px;color:#4fd6a4;opacity:.7;font-family:Consolas,monospace}
+.cyber-tool-grid{position:relative;z-index:2;display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:8px;padding:0 14px 12px}
+.cyber-tool{display:flex;align-items:center;gap:10px;text-align:left;padding:10px 11px;border-radius:11px;border:1px solid rgba(64,224,168,.18);background:linear-gradient(145deg,rgba(255,255,255,.03),rgba(0,0,0,.14));color:#d6fff0;cursor:pointer;transition:all .16s;position:relative;overflow:hidden}
+.cyber-tool::before{content:"";position:absolute;left:0;top:0;bottom:0;width:2px;background:linear-gradient(180deg,#6affc0,#12b981);opacity:0;transition:opacity .16s}
+.cyber-tool:hover{border-color:rgba(64,224,168,.55);transform:translateY(-1px);box-shadow:0 10px 26px rgba(0,0,0,.35),0 0 16px rgba(64,224,168,.14)}
+.cyber-tool:hover::before{opacity:1}
+.cyber-tool-ic{width:32px;height:32px;flex:0 0 32px;border-radius:9px;display:grid;place-items:center;font-size:15px;color:#04221a;background:linear-gradient(145deg,#6affc0,#12b981);box-shadow:0 0 12px rgba(64,224,168,.4)}
+.cyber-tool-body{flex:1;min-width:0}
+.cyber-tool-body b{display:block;font-size:10.5px;color:#e6fff7;font-family:Consolas,monospace;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.cyber-tool-body small{display:block;font-size:8px;color:#4fd6a4;letter-spacing:.6px;text-transform:uppercase;margin-top:1px}
+.cyber-tool-body em{display:block;font-size:8.5px;font-style:normal;color:#7fb8a4;margin-top:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.cyber-tool-go{font-family:Consolas,monospace;font-size:8.5px;letter-spacing:.6px;color:#6affc0;border:1px solid rgba(64,224,168,.3);border-radius:6px;padding:4px 7px;white-space:nowrap;transition:all .16s}
+.cyber-tool:hover .cyber-tool-go{background:rgba(64,224,168,.16)}
+.cyber-console-out{position:relative;z-index:2;margin:0 14px 12px;border-radius:12px;border:1px solid rgba(64,224,168,.22);background:rgba(0,0,0,.45);overflow:hidden}
+.cyber-console-bar{display:flex;align-items:center;gap:9px;padding:8px 11px;border-bottom:1px solid rgba(64,224,168,.16);background:rgba(10,30,26,.6)}
+.cyber-console-bar b{font-family:Consolas,monospace;font-size:9px;letter-spacing:1.6px;color:#8ff3c6;flex:1}
+.cyber-dot-live{width:8px;height:8px;border-radius:50%;background:#4be08a;box-shadow:0 0 10px #4be08a;animation:aiParityPulse 1.6s ease-in-out infinite}
+.cyber-run-state{font-family:Consolas,monospace;font-size:8.5px;letter-spacing:1px;text-transform:uppercase;padding:3px 8px;border-radius:6px;border:1px solid rgba(64,224,168,.3);color:#8ff3c6}
+.cyber-run-state[data-state="running"]{color:#ffd97a;border-color:rgba(255,210,120,.45);animation:aiParityPulse 1s ease-in-out infinite}
+.cyber-run-state[data-state="done"]{color:#4be08a;border-color:rgba(75,224,138,.5)}
+.cyber-run-state[data-state="error"]{color:#ff8a8a;border-color:rgba(255,120,120,.5)}
+.cyber-output{margin:0;padding:12px;min-height:130px;max-height:300px;overflow:auto;font-family:Consolas,"SFMono-Regular",monospace;font-size:10.5px;line-height:1.55;color:#9dffd0;white-space:pre-wrap;word-break:break-word;text-shadow:0 0 6px rgba(64,224,168,.25)}
+.cyber-output::-webkit-scrollbar{width:9px;height:9px}
+.cyber-output::-webkit-scrollbar-thumb{background:rgba(64,224,168,.3);border-radius:9px}
+.cyber-output::-webkit-scrollbar-track{background:rgba(0,0,0,.3)}
+.cyber-foot{position:relative;z-index:2;padding:9px 14px;border-top:1px solid rgba(64,224,168,.16);font-family:Consolas,monospace;font-size:8.5px;letter-spacing:.4px;color:#3f9c7d;text-align:center;background:rgba(0,0,0,.25)}
+@media(max-width:700px){
+  .cyber-console-head{flex-direction:column;align-items:flex-start}
+  .cyber-console-badges{justify-content:flex-start}
+  .cyber-tool-grid{grid-template-columns:1fr}
+  .cyber-toolbar{flex-direction:column;align-items:stretch}
+}
