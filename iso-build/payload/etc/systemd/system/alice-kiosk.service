@@ -1,0 +1,22 @@
+[Unit]
+Description=Alice OS kiosk graphical session (X + browser)
+After=alice-os.service systemd-user-sessions.service
+Requires=alice-os.service
+Conflicts=getty@tty1.service
+
+[Service]
+Type=simple
+User=alice
+Group=alice
+PAMName=login
+TTYPath=/dev/tty1
+StandardInput=tty
+StandardOutput=tty
+Environment=HOME=/home/alice
+Environment=XDG_RUNTIME_DIR=/run/user/1000
+ExecStart=/usr/bin/startx /usr/bin/openbox-session -- :0 vt1 -keeptty -nolisten tcp
+Restart=always
+RestartSec=2
+
+[Install]
+WantedBy=graphical.target

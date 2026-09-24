@@ -1,0 +1,31 @@
+# Build artifacts (regenerate with iso-build/*.sh)
+*.iso
+*.img
+*.squashfs
+iso-build/image/
+iso-build/chroot/
+iso-build/*.log
+
+# Heavy / binary offline model (fetch with tools/fetch_voice_model.sh)
+alice-os/voice_models/
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+.venv/
+venv/
+
+# Runtime / sensitive data (created at first run)
+alice-os/data/auth.json
+alice-os/data/voice.json
+alice-os/data/security_events.json
+alice-os/data/monitor_events.json
+alice-os/data/supervisor.json
+alice-os/data/workflow_history.json
+alice-os/cloud_data/
+
+# OS / editor noise
+.DS_Store
+Thumbs.db
+*.swp

@@ -1,0 +1,2 @@
+93e3c55cff34e8daee4ff7cb55564b309ea46bc1c1afdb413ace988ace82b0bd  native/build/initrd-alice.img
+46c374ea9ef50d5d791d81474a72bf913ca34b99f7a4e747727046d10ba15bda  /tmp/alice-init-11.1

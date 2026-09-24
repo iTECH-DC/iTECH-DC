@@ -1,0 +1,20 @@
+[Unit]
+Description=Alice OS local assistant server (offline, loopback-only)
+After=network.target sound.target
+Wants=sound.target
+
+[Service]
+Type=simple
+User=alice
+Group=alice
+WorkingDirectory=/opt/alice-os
+Environment=HOME=/home/alice
+Environment=ALICE_KIOSK=1
+ExecStart=/usr/bin/python3 /opt/alice-os/run_alice.py --no-browser
+Restart=always
+RestartSec=2
+StandardOutput=journal
+StandardError=journal
+
+[Install]
+WantedBy=multi-user.target

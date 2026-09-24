@@ -1,0 +1,14 @@
+[
+  {
+    "title": "Workflow completed",
+    "message": "Alice completed the 'diagnostics' workflow. Review the result in Automation.",
+    "level": "info",
+    "time": "2026-09-20 12:14:22"
+  },
+  {
+    "title": "Security event detected",
+    "message": "A local security event was recorded at 1790254073.2961915.",
+    "level": "security",
+    "time": "2026-09-24 12:47:56"
+  }
+]

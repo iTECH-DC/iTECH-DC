@@ -1,0 +1,18 @@
+#!/bin/sh
+# Alice OS 14.0 — console login banner.
+cat <<'BANNER'
+
+   ###    #       ####  ######  #######
+  #   #   #      #    # #       #
+  #   #   #      #      #####   #####
+  #   #   #      #      #       #
+  #   #   #      #    # #       #
+   ###    ######  ####  ######  #######
+
+        ALICE OS 14.0  —  Smarter • Safer • Yours
+   Offline-first desktop with a local voice ethical-hacking assistant.
+
+   The graphical desktop starts automatically on this display.
+   Local assistant endpoint: http://127.0.0.1:8765
+
+BANNER

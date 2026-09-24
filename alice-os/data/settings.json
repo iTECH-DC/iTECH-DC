@@ -1,0 +1,12 @@
+{
+  "user_name": "Owner",
+  "theme": "dark",
+  "accent": "blue",
+  "font_size": "normal",
+  "wallpaper": "default.svg",
+  "voice_enabled": false,
+  "offline_mode": true,
+  "locator_permission": false,
+  "biometric_enabled": false,
+  "auto_lock_minutes": 10
+}

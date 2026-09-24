@@ -1,0 +1,5 @@
+# Alice OS 14.0 — Openbox session autostart (fallback if .xinitrc is bypassed).
+xset s off
+xset -dpms
+xset s noblank
+xsetroot -solid "#0a1020" 2>/dev/null &
