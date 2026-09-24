@@ -10,5 +10,11 @@
     "message": "A local security event was recorded at 1790254073.2961915.",
     "level": "security",
     "time": "2026-09-24 12:47:56"
+  },
+  {
+    "title": "Security event detected",
+    "message": "A local security event was recorded at 1790254073.2961915.",
+    "level": "security",
+    "time": "2026-09-24 12:58:04"
   }
 ]

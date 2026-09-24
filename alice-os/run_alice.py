@@ -2019,17 +2019,29 @@ class AliceHandler(SimpleHTTPRequestHandler):
         except Exception as e:
             return self.send_json({"ok": False, "error": str(e)}, 400)
 
-def system_info():
-    disk = shutil.disk_usage(ROOT)
-    result = {
-        "platform": platform.platform(),
-        "python": platform.python_version(),
-        "cpu_count": os.cpu_count() or 1,
-        "storage_used_percent": round((disk.used / disk.total) * 100, 1),
-        "storage_total_gb": round(disk.total / (1024**3), 2),
-    }
+def _cpu_percent():
+    """Best-effort local CPU utilisation (0-100), cross-platform."""
     try:
-        if os.name == "nt":
+        import psutil
+        return round(float(psutil.cpu_percent(interval=0.1)), 1)
+    except Exception:
+        pass
+    try:
+        load = os.getloadavg()[0]
+        return round(min(100.0, (load / (os.cpu_count() or 1)) * 100.0), 1)
+    except Exception:
+        return None
+
+
+def _ram_percent():
+    """Best-effort local RAM utilisation (0-100), cross-platform."""
+    try:
+        import psutil
+        return round(float(psutil.virtual_memory().percent), 1)
+    except Exception:
+        pass
+    if os.name == "nt":
+        try:
             import ctypes
             class MEMORYSTATUSEX(ctypes.Structure):
                 _fields_ = [("dwLength", ctypes.c_ulong), ("dwMemoryLoad", ctypes.c_ulong),
@@ -2040,11 +2052,40 @@ def system_info():
             m = MEMORYSTATUSEX()
             m.dwLength = ctypes.sizeof(MEMORYSTATUSEX)
             ctypes.windll.kernel32.GlobalMemoryStatusEx(ctypes.byref(m))
-            result["ram_percent"] = m.dwMemoryLoad
-        else:
-            result["ram_percent"] = None
+            return m.dwMemoryLoad
+        except Exception:
+            return None
+    try:
+        with open("/proc/meminfo") as fh:
+            info = {}
+            for line in fh:
+                parts = line.split(":")
+                if len(parts) == 2:
+                    info[parts[0].strip()] = float(parts[1].strip().split()[0])
+        total = info.get("MemTotal")
+        avail = info.get("MemAvailable")
+        if total and avail is not None:
+            return round(((total - avail) / total) * 100.0, 1)
     except Exception:
-        result["ram_percent"] = None
+        pass
+    return None
+
+
+def system_info():
+    disk = shutil.disk_usage(ROOT)
+    storage_used = round((disk.used / disk.total) * 100, 1)
+    result = {
+        "platform": platform.platform(),
+        "python": platform.python_version(),
+        "hostname": platform.node(),
+        "cpu_count": os.cpu_count() or 1,
+        "cpu_percent": _cpu_percent(),
+        "ram_percent": _ram_percent(),
+        "storage_used_percent": storage_used,
+        "storage_percent": storage_used,
+        "storage_total_gb": round(disk.total / (1024**3), 2),
+        "storage_free_gb": round(disk.free / (1024**3), 2),
+    }
     return result
 
 if __name__ == "__main__":
