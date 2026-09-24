@@ -16,7 +16,7 @@ A prebuilt bootable image is attached to the GitHub release:
 
 | File | Size | SHA-256 |
 |------|------|---------|
-| `alice-os-14.0-amd64.iso` | ~451 MB | `ca208a63750bdb7320c27fcce346f7c1f3b5fdcbdb682a7a028df416e09fe1ee` |
+| `alice-os-14.0-amd64.iso` | ~451 MB | `706f03decc003e9ec13334af5deefcb9ab36cf50ce3936a8d267d66a78ca9f89` |
 
 **Download:** <https://github.com/iTECH-DC/iTECH-DC/releases/download/v14.0.0/alice-os-14.0-amd64.iso>
 
@@ -24,7 +24,7 @@ Verify it:
 
 ```bash
 sha256sum alice-os-14.0-amd64.iso
-# ca208a63750bdb7320c27fcce346f7c1f3b5fdcbdb682a7a028df416e09fe1ee
+# 706f03decc003e9ec13334af5deefcb9ab36cf50ce3936a8d267d66a78ca9f89
 ```
 
 > Prefer to build it yourself? See **Quick start** below — the full pipeline is
