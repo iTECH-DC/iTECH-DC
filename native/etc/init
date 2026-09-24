@@ -1,8 +1,0 @@
-#!/bin/sh
-# Minimal initramfs entrypoint. Mounts are best-effort because the native init
-# can also run in a minimal test environment without mount helpers.
-mount -t proc proc /proc 2>/dev/null || true
-mount -t sysfs sysfs /sys 2>/dev/null || true
-mount -t devtmpfs devtmpfs /dev 2>/dev/null || true
-printf '%s\n' '[alice-initramfs] Alice OS userspace starting'
-exec /bin/alice-init
