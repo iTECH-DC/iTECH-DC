@@ -1,0 +1,3 @@
+# Optional local telemetry enhancement. Alice OS also runs without it.
+psutil>=6.0,<8
+cryptography>=43,<48
