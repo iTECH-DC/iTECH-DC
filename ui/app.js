@@ -1259,11 +1259,11 @@ window.addEventListener('DOMContentLoaded',()=>{setTimeout(()=>refreshActionCent
 (() => {
   const esc = window.escapeHtml || (x => String(x).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])));
   const panel=()=>document.getElementById('aliceAssistantPanel');
-  window.openAliceAssistant=async()=>{const p=panel();if(!p)return;p.classList.remove('hidden');document.getElementById('assistantInput')?.focus();try{await api('/api/alice-assistant/status')}catch(e){toast('Alice','Local assistant is unavailable.');}};
+  window.openAliceAssistant=async()=>{const p=panel();if(!p)return;p.classList.remove('hidden');document.getElementById('assistantInput')?.focus();try{await api('/api/alice-assistant/status')}catch(e){toast('Alice','Local assistant is unavailable.');}try{const m=await api('/api/ai/parity');const f=document.getElementById('assistantModeFoot');if(f)f.textContent=m.mode==='online-ai'?'● Online AI active':(m.mode==='online-local'?'◐ Online · local brain':'◐ Offline parity · local brain');}catch(e){}};
   window.closeAliceAssistant=()=>panel()?.classList.add('hidden');
-  function add(role,text){const host=document.getElementById('assistantTranscript');if(!host)return;const row=document.createElement('div');row.className=`assistant-message ${role}`;row.innerHTML=`<b>${role==='alice'?'Alice':'You'}</b><span>${esc(text).replace(/\n/g,'<br>')}</span>`;host.appendChild(row);host.scrollTop=host.scrollHeight;}
+  function add(role,text,label){const host=document.getElementById('assistantTranscript');if(!host)return;const row=document.createElement('div');row.className=`assistant-message ${role}`;const name=role==='alice'?(label||'Alice'):'You';row.innerHTML=`<b>${esc(name)}</b><span>${esc(text).replace(/\n/g,'<br>')}</span>`;host.appendChild(row);host.scrollTop=host.scrollHeight;}
   window.askAlicePreset=(text)=>{const i=document.getElementById('assistantInput');if(i)i.value=text;document.getElementById('assistantForm')?.requestSubmit();};
-  async function ask(text){text=String(text||'').trim();if(!text)return;add('user',text);const i=document.getElementById('assistantInput');if(i)i.value='';try{const d=await api('/api/alice-assistant/query',{method:'POST',body:JSON.stringify({text})});add('alice',d.answer||d.message||'I could not find a local answer.');}catch(e){add('alice','The local assistant service is unavailable right now. Check Alice System Control.');}}
+  async function ask(text){text=String(text||'').trim();if(!text)return;add('user',text);const i=document.getElementById('assistantInput');if(i)i.value='';try{const d=await api('/api/alice-assistant/query',{method:'POST',body:JSON.stringify({text})});const prov=d.provider?(d.provider==='offline-brain'?'Alice · local brain':(d.provider==='gpt'?'GPT · online':(d.provider==='claude'?'Claude · online':d.provider))):'Alice';add('alice',d.answer||d.message||'I could not find a local answer.',prov);}catch(e){add('alice','The local assistant service is unavailable right now. Check Alice System Control.');}}
   document.addEventListener('DOMContentLoaded',()=>{document.getElementById('assistantForm')?.addEventListener('submit',e=>{e.preventDefault();ask(document.getElementById('assistantInput')?.value);});});
 })();
 // ---------- end v10.8 Unified Assistant ----------
@@ -1288,6 +1288,7 @@ window.addEventListener('DOMContentLoaded',()=>{setTimeout(()=>refreshActionCent
       $('aiAnthropicStatus').textContent=d.claude.configured?(d.claude.enabled?'Ready':'Key detected; disabled'):'API key not configured';
       $('aiSecurityStatus').textContent=d.security_ai.enabled?'Local defensive audit':'Disabled';
       $('aiFridayStatus').textContent=d.friday.enabled?'Active':'Disabled';
+      if($('aiAutoOnline'))$('aiAutoOnline').checked=d.auto_online_ai!==false;
       $('aiNetworkEnabled').checked=!!d.network_ai_enabled;
       $('aiOpenAIEnabled').checked=!!d.gpt.enabled;
       $('aiAnthropicEnabled').checked=!!d.claude.enabled;
@@ -1296,29 +1297,90 @@ window.addEventListener('DOMContentLoaded',()=>{setTimeout(()=>refreshActionCent
       $('aiAnthropicModel').value=d.claude.model||'claude-sonnet-5';
       $('aiSecurityModel').value=d.security_ai.cloud_model||'gpt-5.6-cyber';
       $('aiRoutingMode').value=d.routing_mode||'friday-smart';
-      $('aiNetworkFoot').textContent=d.cloud_ready?'Network AI ON':'Network AI OFF';
+      $('aiNetworkFoot').textContent=d.cloud_ready?'Online AI ACTIVE':'Offline parity';
+      renderAIParity(d);
     }catch(e){add('alice','Intelligence status is unavailable.','FRIDAY');}
+  }
+  function renderAIParity(d){
+    const banner=$('aiParityBanner'); if(!banner)return;
+    const mode=d.mode||'offline-local';
+    const online=!!d.online;
+    const quality=d.quality||'offline';
+    banner.dataset.mode=mode;
+    const dot=$('aiParityDot'); if(dot)dot.className='ai-parity-dot '+(online?'on':'off');
+    const title=$('aiParityMode'), detail=$('aiParityDetail');
+    if(mode==='online-ai'){
+      if(title)title.textContent='Online — running directly with AI';
+      if(detail)detail.textContent=`Provider ready · ${quality} connection · cloud responses enabled`;
+    } else if(mode==='online-local'){
+      if(title)title.textContent='Online — local brain (no provider ready)';
+      if(detail)detail.textContent='Connected, but no cloud key/model is enabled. Enable GPT or Claude for direct AI.';
+    } else {
+      if(title)title.textContent='Offline — local brain parity';
+      if(detail)detail.textContent='No network needed. Full local reasoning, math, definitions and system skills.';
+    }
   }
   window.saveAliceAIConfig=async()=>{
     try{
-      const d=await api('/api/ai/config',{method:'POST',body:JSON.stringify({network_ai_enabled:$('aiNetworkEnabled').checked,openai_enabled:$('aiOpenAIEnabled').checked,anthropic_enabled:$('aiAnthropicEnabled').checked,security_ai_enabled:$('aiSecurityEnabled').checked,friday_enabled:true,openai_model:$('aiOpenAIModel').value,anthropic_model:$('aiAnthropicModel').value,security_model:$('aiSecurityModel').value,routing_mode:$('aiRoutingMode').value})});
+      const d=await api('/api/ai/config',{method:'POST',body:JSON.stringify({auto_online_ai:$('aiAutoOnline')?.checked!==false,network_ai_enabled:$('aiNetworkEnabled').checked,openai_enabled:$('aiOpenAIEnabled').checked,anthropic_enabled:$('aiAnthropicEnabled').checked,security_ai_enabled:$('aiSecurityEnabled').checked,friday_enabled:true,openai_model:$('aiOpenAIModel').value,anthropic_model:$('aiAnthropicModel').value,security_model:$('aiSecurityModel').value,routing_mode:$('aiRoutingMode').value})});
       await refreshAliceAI(); toast('Intelligence Core',d.ok?'Settings saved locally.':'Could not save settings.');
     }catch(e){toast('Intelligence Core',e.message);}
   };
+  // ----- Cool Ethical Security Workbench console -----
+  let cyberTools=[], cyberCategory='all';
+  const CYBER_CAT_ICON={recon:'\u2316',network:'\u21c4',hardening:'\u26e8',supply:'\u26d3',analysis:'\u2315',forensics:'\u2318',lab:'\u2623',password:'\u26bf',web:'\u2318',malware:'\u2623',code:'{ }',other:'\u25c8'};
+  function cyberCatId(cat){const c=String(cat||'').toLowerCase();if(c.includes('recon'))return'recon';if(c.includes('network'))return'network';if(c.includes('hardening'))return'hardening';if(c.includes('supply'))return'supply';if(c.includes('analysis')||c.includes('forensic'))return'analysis';if(c.includes('lab'))return'lab';if(c.includes('password'))return'password';if(c.includes('web'))return'web';if(c.includes('malware'))return'malware';if(c.includes('code'))return'code';return'other';}
+  function renderCyberTabs(){
+    const host=$('cyberTabs'); if(!host)return;
+    const cats=['all',...Array.from(new Set(cyberTools.map(t=>cyberCatId(t.category))))];
+    host.innerHTML=cats.map(c=>`<button class="cyber-tab ${c===cyberCategory?'active':''}" onclick="setCyberCategory('${c}')">${c==='all'?'\u25c8 All':(CYBER_CAT_ICON[c]||'\u2022')+' '+c}</button>`).join('');
+  }
+  window.setCyberCategory=(c)=>{cyberCategory=c;renderCyberTabs();renderCyberTools();const lbl=$('cyberActiveCategory');if(lbl)lbl.textContent=c==='all'?'All tools':c+' tools';};
+  function renderCyberTools(){
+    const box=$('cyberToolsGrid'); if(!box)return;
+    const list=cyberTools.filter(t=>cyberCategory==='all'||cyberCatId(t.category)===cyberCategory);
+    if(!list.length){box.innerHTML='<span class="cyber-empty">No tools in this category.</span>';return;}
+    box.innerHTML=list.map(t=>`<button class="cyber-tool" onclick="runCyberTool(${JSON.stringify(t.id)})"><span class="cyber-tool-ic">${CYBER_CAT_ICON[cyberCatId(t.category)]||'\u25c8'}</span><span class="cyber-tool-body"><b>${esc(t.name)}</b><small>${esc(t.category)}</small><em>${esc(t.description)}</em></span><span class="cyber-tool-go">RUN \u25b8</span></button>`).join('');
+  }
   window.loadCyberTools=async()=>{
-    const box=$("cyberToolsGrid"); if(!box)return; box.innerHTML="Loading…";
-    try{const d=await api("/api/security/tools"); box.innerHTML=(d.tools||[]).map(t=>`<button class="primary-btn cyber-tool" title="${esc(t.description)}" onclick="runCyberTool(${JSON.stringify(t.id)})"><b>${esc(t.name)}</b><small>${esc(t.category)}</small></button>`).join(""); await refreshCyberToolStatus();}
-    catch(e){box.textContent="Security tool catalog unavailable.";}
+    const box=$("cyberToolsGrid"); if(!box)return; box.innerHTML='<span class="cyber-empty">Loading defensive tools\u2026</span>';
+    try{const d=await api("/api/security/tools"); cyberTools=d.tools||[]; renderCyberTabs(); renderCyberTools(); await refreshCyberToolStatus();}
+    catch(e){box.innerHTML='<span class="cyber-empty">Security tool catalog unavailable.</span>';}
   };
   window.refreshCyberToolStatus=async()=>{
-    const box=$("cyberStatusGrid"); if(!box)return; box.innerHTML="Checking local tool availability…";
-    try{const d=await api("/api/security/tool-status"); box.innerHTML=(d.tools||[]).map(t=>`<div class="cyber-status-card"><span class="cyber-dot ${t.installed?'on':'off'}"></span><div><b>${esc(t.tool)}</b><small>${t.installed?esc(t.version||'Available'):'Not installed'}</small></div></div>`).join("");}
-    catch(e){box.textContent="Tool status unavailable.";}
+    const box=$("cyberStatusGrid"); if(!box)return; box.innerHTML='<span class="cyber-empty">Checking local tool availability\u2026</span>';
+    try{const d=await api("/api/security/tool-status"); box.innerHTML=(d.tools||[]).map(t=>`<div class="cyber-status-card ${t.installed?'is-on':'is-off'}"><span class="cyber-dot ${t.installed?'on':'off'}"></span><div><b>${esc(t.tool)}</b><small>${t.installed?esc(t.version||'Available'):'Not installed'}</small></div></div>`).join("");}
+    catch(e){box.innerHTML='<span class="cyber-empty">Tool status unavailable.</span>';}
   };
+  function cyberPrint(text){const out=$("cyberToolOutput");if(!out)return;out.textContent=text;out.scrollTop=0;}
+  function cyberState(s){const el=$("cyberRunState");if(el){el.textContent=s;el.dataset.state=s;}}
+  window.clearCyberOutput=()=>{cyberPrint('$ alice-security --ready\nConsole cleared. Awaiting an authorized defensive task\u2026');cyberState('idle');};
   window.runCyberTool=async(id,args={})=>{
-    const out=$("cyberToolOutput"); if(!out)return; out.textContent="Running authorized defensive check…";
-    try{const d=await api("/api/security/tool",{method:"POST",body:JSON.stringify({tool:id,args})}); out.textContent=JSON.stringify(d.result||d,null,2);}
-    catch(e){out.textContent=`Security tool error: ${e.message}`;}
+    const t=cyberTools.find(x=>x.id===id)||{name:id,category:''};
+    cyberState('running');
+    cyberPrint(`$ alice-security run ${id}\n> ${t.name} \u00b7 ${t.category}\n> scope: localhost / workspace (defensive)\n\n[ scanning\u2026 ]`);
+    try{
+      const d=await api("/api/security/tool",{method:"POST",body:JSON.stringify({tool:id,args})});
+      const stamp=new Date().toLocaleTimeString();
+      cyberPrint(`$ alice-security run ${id}\n> ${t.name} \u00b7 ${t.category}\n> completed ${stamp} \u00b7 status OK\n${'\u2500'.repeat(46)}\n${JSON.stringify(d.result||d,null,2)}`);
+      cyberState('done');
+    }catch(e){cyberPrint(`$ alice-security run ${id}\n> ${t.name}\n${'\u2500'.repeat(46)}\n[!] error: ${e.message}`);cyberState('error');}
+  };
+  window.runCyberAudit=async()=>{
+    cyberState('running');
+    cyberPrint('$ alice-security quick-audit --authorized\n> running local defensive checks\u2026\n');
+    const steps=['system_inventory','config_audit','local_ports','secret_scan'];
+    let acc='$ alice-security quick-audit --authorized\n> scope: localhost / workspace \u00b7 defensive-only\n\n';
+    for(const id of steps){
+      const t=cyberTools.find(x=>x.id===id)||{name:id};
+      acc+=`[ ${t.name} ] \u2026\n`;
+      cyberPrint(acc);
+      try{await api("/api/security/tool",{method:"POST",body:JSON.stringify({tool:id,args:{}})});acc+=`  \u2714 ${t.name} complete\n`;}
+      catch(e){acc+=`  \u2716 ${t.name} failed: ${e.message}\n`;}
+      cyberPrint(acc);
+    }
+    acc+=`\n${'\u2500'.repeat(46)}\nQuick audit finished. Review findings above. No remote target was touched.`;
+    cyberPrint(acc);cyberState('done');
   };
 
   window.runAliceSecurityReview=async()=>{

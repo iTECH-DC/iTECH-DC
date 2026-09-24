@@ -1,0 +1,13 @@
+__pycache__/
+*.pyc
+*.pyo
+logs/*.log
+data/*.pid
+.DS_Store
+
+# runtime state
+data/*.db
+data/*.db-shm
+data/*.db-wal
+data/alice_cloud_sync.json
+data/alice.pid
